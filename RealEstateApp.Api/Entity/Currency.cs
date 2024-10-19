@@ -12,10 +12,7 @@
         {
             return new List<Currency>
             {
-                new Currency("USD"),
-                new Currency("TRY"),
-                new Currency("EUR"),
-                new Currency("GBP")
+                new Currency("Rupee")
             };
         }
     }

@@ -31,7 +31,7 @@ namespace RealEstateApp.Api.Controllers
                 {
                     Id = user.Id,
                     Username = user.Username,
-                    Email = user.Email
+                    PhoneNumber = user.PhoneNumber
                 });
             }
             return Ok(users);

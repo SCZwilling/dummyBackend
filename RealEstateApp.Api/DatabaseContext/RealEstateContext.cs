@@ -11,6 +11,7 @@ namespace RealEstateApp.Api.DatabaseContext
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<PropertyStatus> PropertyStatuses { get; set; }
         public DbSet<PropertyType> PropertyTypes { get; set; }
+        public DbSet<SavePropertyFilter> PropertyFilters { get; set; }
 
         public RealEstateContext(DbContextOptions<RealEstateContext> opt) : base(opt)
         {

@@ -39,17 +39,17 @@ namespace RealEstateApp.Api.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
         {
-            var user = await _userManager.FindByNameAsync(request.Username);
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.PhoneNumber == request.PhoneNumber);
             if (user != null && await _userManager.CheckPasswordAsync(user, request.Password))
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
 
-                var student = await _context.Users.SingleAsync(s => s.Email == user.Email);
+                var student = await _context.Users.SingleAsync(s => s.PhoneNumber == user.PhoneNumber);
 
                 var authClaims = new List<Claim>
                 {
                     new Claim("Id", student.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Name, user.PhoneNumber),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -79,18 +79,20 @@ namespace RealEstateApp.Api.Controllers
 
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
-                return Conflict(new ResponseDTO { Status = "Error", Message = "Username or email already in use." });
+                return Conflict(new ResponseDTO { Status = "Error", Message = "Username or Contact Number in use." });
 
-            var emailExists = await _userManager.FindByEmailAsync(model.Email);
-            if (emailExists != null)
-                return Conflict(new ResponseDTO { Status = "Error", Message = "Username or email already in use." });
+            var phoneNumberExists = await _userManager.FindByEmailAsync(model.PhoneNumber);
+            if (phoneNumberExists != null)
+                return Conflict(new ResponseDTO { Status = "Error", Message = "Username or Contact Number in use." });
+
 
             IdentityUser user = new()
             {
-                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
             };
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseDTO { Status = "Error", Message = "User creation failed. Please check user details and try again." });
@@ -100,23 +102,30 @@ namespace RealEstateApp.Api.Controllers
             User newUser = new()
             {
                 Name = user.UserName,
-                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 Username = user.UserName
             };
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
+
+            try{
+                _context.Users.Add(newUser);
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+            }
 
             return Ok(new ResponseDTO { Status = "Success", Message = "User created successfully." });
         }
+
 
         [HttpPost]
         [Route("register-admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterRequestDTO model)
         {
-            if (model.Username == null || model.Email == null || model.Password == null)
+            if (model.Username == null || model.PhoneNumber == null || model.Password == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseDTO { Status = "Error", Message = "User creation failed. Please check user details and try again." });
             model.Username = model.Username.Trim();
-            model.Email = model.Email.Trim();
+            model.PhoneNumber = model.PhoneNumber.Trim();
             model.Password = model.Password.Trim();
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
@@ -124,7 +133,7 @@ namespace RealEstateApp.Api.Controllers
 
             IdentityUser user = new()
             {
-                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
             };
@@ -148,7 +157,7 @@ namespace RealEstateApp.Api.Controllers
             User newUser = new()
             {
                 Name = user.UserName,
-                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
                 Username = user.UserName
             };
             _context.Users.Add(newUser);

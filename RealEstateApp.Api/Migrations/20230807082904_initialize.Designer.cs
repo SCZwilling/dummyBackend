@@ -114,7 +114,10 @@ namespace RealEstateApp.Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(15)");
+                    
+                    b.Property<string>("NormalizedPhone")
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
@@ -133,6 +136,8 @@ namespace RealEstateApp.Api.Migrations
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
+                    b.HasIndex("NormalizedPhone")
+                        .HasDatabaseName("PhoneIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()

@@ -12,11 +12,15 @@
         {
             return new List<PropertyType>
             {
+                new PropertyType("Aggriculture Land"),
                 new PropertyType("Apartment"),
+                new PropertyType("Commercial Land"),
+                new PropertyType("Hostel"),
                 new PropertyType("House"),
-                new PropertyType("Townhome"),
-                new PropertyType("Land"),
-                new PropertyType("Villa")
+                new PropertyType("Industrial land"),
+                new PropertyType("Office Space"),
+                new PropertyType("Plot"),
+                new PropertyType("Shop")
             };
         }
     }

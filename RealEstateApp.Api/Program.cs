@@ -182,7 +182,7 @@ else
         {
             UserName = "admin",
             SecurityStamp = Guid.NewGuid().ToString(),
-            Email = configuration["Credentials:AdminEmail"]
+            PhoneNumber = configuration["Credentials:AdminPhone"]
         };
         var result = await userManager.CreateAsync(newAdminUser, configuration["Credentials:AdminPassword"]);
         if (result.Succeeded)
@@ -192,7 +192,7 @@ else
             var newUser = new User()
             {
                 Name = newAdminUser.UserName,
-                Email = newAdminUser.Email,
+                PhoneNumber = newAdminUser.PhoneNumber,
                 Username = newAdminUser.UserName
             };
             realEstateContext.Users.Add(newUser);

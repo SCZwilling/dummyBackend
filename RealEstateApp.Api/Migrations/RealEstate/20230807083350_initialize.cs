@@ -18,7 +18,7 @@ namespace RealEstateApp.Api.Migrations.RealEstate
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PhoneNumber = table.Column<string>(type: "nvarchar(15)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -69,6 +69,36 @@ namespace RealEstateApp.Api.Migrations.RealEstate
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+                
+            migrationBuilder.CreateTable(
+                name: "PropertyFilters",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MinPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MaxPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CurrencyTypeId = table.Column<int>(type: "int", nullable: false),
+                    PropertyTypeId = table.Column<int>(type: "int", nullable: false),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    AppliedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    UserId = table.Column<int>(type: "int", nullable: false, defaultValue: 0)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PropertyFilters", x => x.Id);
+                    // table.ForeignKey(
+                    //     name: "FK_PropertyFilters_Users_UserId",
+                    //     column: x => x.UserId,
+                    //     principalTable: "Users",
+                    //     principalColumn: "Id",
+                    //     onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PropertyFilters_UserId",
+                table: "PropertyFilters",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Properties_UserId",

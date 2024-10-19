@@ -6,8 +6,7 @@ namespace RealEstateApp.Api.DTO.AuthDTO
     {
         public string Username { get; set; }
 
-        public string Email { get; set; }
-
+        public string PhoneNumber { get; set; }
         public string Password { get; set; }
 
         private bool CheckUsername()
@@ -15,10 +14,46 @@ namespace RealEstateApp.Api.DTO.AuthDTO
             return Regex.IsMatch(Username, pattern: "^[a-z0-9]+$");
         }
 
-        private bool CheckEmail()
+        public static bool IsValidPhoneNumber(string phoneNumber)
         {
-            return Regex.IsMatch(Email, pattern: "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                return false;
+            }
+
+            phoneNumber = phoneNumber.Trim();
+
+            if (!phoneNumber.All(char.IsDigit))
+            {
+                return false;
+            }
+
+            if (phoneNumber.Length != 10)
+            {
+                return false;
+            }
+
+            // Ensure the phone number doesn't start with 0 or 1
+            if (phoneNumber[0] == '0' || phoneNumber[0] == '1')
+            {
+                return false;
+            }
+
+            // Prevent all digits from being the same (e.g., 1111111111)
+            if (phoneNumber.Distinct().Count() == 1)
+            {
+                return false;
+            }
+
+            // Prevent sequential numbers (e.g., 1234567890 or 9876543210)
+            if ("1234567890".Contains(phoneNumber) || "0987654321".Contains(phoneNumber))
+            {
+                return false;
+            }
+
+            return true;
         }
+
 
         private bool CheckPassword()
         {
@@ -49,9 +84,9 @@ namespace RealEstateApp.Api.DTO.AuthDTO
         public bool IsValid()
         {
             Username = Username.Trim();
-            Email = Email.Trim();
+            PhoneNumber = PhoneNumber.Trim();
             Password = Password.Trim();
-            return CheckUsername() && CheckEmail() && CheckPassword();
+            return CheckUsername() && IsValidPhoneNumber(PhoneNumber) && CheckPassword();
         }
 
 
