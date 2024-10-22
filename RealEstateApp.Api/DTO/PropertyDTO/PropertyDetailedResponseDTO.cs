@@ -17,6 +17,8 @@ namespace RealEstateApp.Api.DTO.PropertyDTO
         public string Type { get; set; }
         public UserInfoDTO Owner { get; set; }
         public List<PropertyFieldInfoDTO<PropertyImage>> Images { get; set; }
+        public string PropertyInfo { get; set; }
+
 
     }
 }

@@ -10,5 +10,8 @@
         public int PropertyStatusId { get; set; }
         public int CurrencyId { get; set; }
         public int Price { get; set; }
+        public string PropertyInfo { get; set; }
+
+
     }
 }

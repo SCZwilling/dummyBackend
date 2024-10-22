@@ -16,6 +16,10 @@
         public int PropertyTypeId { get; set; }
         public int PropertyStatusId { get; set; }
         public int CurrencyId { get; set; }
+        public int FilterId { get; set; }
+        public int SortId { get; set; }
+        public string PropertyInfo { get; set; }
+
         public ICollection<PropertyImage> PropertyImages { get; set; }
     }
 }

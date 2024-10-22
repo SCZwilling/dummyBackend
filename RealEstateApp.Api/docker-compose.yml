@@ -13,7 +13,7 @@ services:
       - JWT__ValidAudience=${JWT__ValidAudience}
       - JWT__ValidIssuer=${JWT__ValidIssuer}
       - JWT__Secret=${JWT__Secret}
-      - Credentials__AdminEmail=${Credentials__AdminEmail}
+      - Credentials__AdminPhone=${Credentials__AdminPhone}
       - Credentials__AdminPassword=${Credentials__AdminPassword}
       - ApplyMigrationsOnBoot=${ApplyMigrationsOnBoot}
       # - ASPNETCORE_URLS=http://0.0.0.0:80

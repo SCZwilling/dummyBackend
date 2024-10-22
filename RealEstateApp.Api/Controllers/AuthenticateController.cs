@@ -61,7 +61,7 @@ namespace RealEstateApp.Api.Controllers
                 var token = GetToken(authClaims);
 
                 return Ok(new
-                {
+                {   
                     token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo,
                     roles = userRoles
@@ -79,12 +79,11 @@ namespace RealEstateApp.Api.Controllers
 
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
-                return Conflict(new ResponseDTO { Status = "Error", Message = "Username or Contact Number in use." });
+                return Conflict(new ResponseDTO { Status = "Error", Message = "Username in use." });
 
-            var phoneNumberExists = await _userManager.FindByEmailAsync(model.PhoneNumber);
-            if (phoneNumberExists != null)
-                return Conflict(new ResponseDTO { Status = "Error", Message = "Username or Contact Number in use." });
-
+            var phoneNumberExists = await _userManager.Users.AnyAsync(u => u.PhoneNumber == model.PhoneNumber);
+            if (phoneNumberExists)
+                return Conflict(new ResponseDTO { Status = "Error", Message = "Contact Number in use." });
 
             IdentityUser user = new()
             {

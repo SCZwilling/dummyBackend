@@ -16,6 +16,8 @@ namespace RealEstateApp.Api.DTO.PropertyDTO
         public int CurrencyId { get; set; }
         public string Thumbnail { get; set; }
         public List<string> Images { get; set; }
+        public string PropertyInfo { get; set; }
+
         public PropertyCreateResponseDTO(Property property, List<string> images)
         {
             Price = property.Price;
@@ -29,6 +31,7 @@ namespace RealEstateApp.Api.DTO.PropertyDTO
             CurrencyId = property.CurrencyId;
             Thumbnail = property.Thumbnail;
             Images = images;
+            PropertyInfo = property.PropertyInfo;
         }
     }
 }

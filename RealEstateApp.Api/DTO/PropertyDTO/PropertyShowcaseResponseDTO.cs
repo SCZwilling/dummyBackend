@@ -8,5 +8,7 @@
         public int Price { get; set; }
         public string Type { get; set; }
         public string Thumbnail { get; set; }
+        public string PropertyInfo { get; set; }
+
     }
 }

@@ -37,7 +37,10 @@ namespace RealEstateApp.Api.Migrations.RealEstate
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    FilterId = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    SortId = table.Column<int>(type: "int", nullable: false),
+                    PropertyInfo = table.Column<string>(type: "nvarchar(256)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,6 +125,8 @@ namespace RealEstateApp.Api.Migrations.RealEstate
 
             migrationBuilder.DropTable(
                 name: "Users");
+            
+            migrationBuilder.Sql("DROP SEQUENCE SortIdSequence;");
         }
     }
 }

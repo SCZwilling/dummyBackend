@@ -101,6 +101,7 @@ namespace RealEstateApp.Api.Controllers
                 Type = result.PropertyType.Value,
                 Currency = result.Currency.Value,
                 Owner = new UserInfoDTO(result.User),
+                PropertyInfo = result.PropertyInfo,
             };
             return Ok(responseDTO);
         }
@@ -258,7 +259,7 @@ public async Task<IActionResult> GetPaginated([FromQuery] PropertyGetPaginatedRe
     // Filter the properties based on the request
     var query = _context.Properties
         .AsNoTracking()
-        .Where(x => x.Status != (int)EntityStatus.Deleted)
+        .Where(x => x.Status != (int)EntityStatus.Deleted && x.FilterId == 1)
         .Where(x => x.PropertyTypeId == request.TypeId || request.TypeId == null)
         .Where(x => x.PropertyStatusId == request.StatusId || request.StatusId == null)
         .Where(x => x.CurrencyId == request.CurrencyId || request.CurrencyId == null)
@@ -266,7 +267,84 @@ public async Task<IActionResult> GetPaginated([FromQuery] PropertyGetPaginatedRe
         .Include(x => x.Currency)
         .Include(x => x.PropertyStatus)
         .Include(x => x.PropertyType)
-        .OrderBy(x => x.Id);
+        .OrderBy(x => x.SortId);
+
+    var totalItems = await query.CountAsync();
+    var numberOfPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+    var result = await query.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
+
+    if (result == null)
+    {
+        return NotFound();
+    }
+
+    // Map properties to DTOs
+    var responseData = new List<PropertyShowcaseResponseDTO>();
+    foreach (var property in result)
+    {
+        var dto = new PropertyShowcaseResponseDTO
+        {
+            Id = property.Id,
+            Thumbnail = property.Thumbnail,
+            Status = property.PropertyStatus.Value,
+            Type = property.PropertyType.Value,
+            Currency = property.Currency.Value,
+            Price = property.Price,
+        };
+        responseData.Add(dto);
+    }
+
+    var responseDTO = new PropertyGetPaginatedResponseDTO()
+    {
+        Items = responseData,
+        NumberOfPages = numberOfPages,
+        CurrentPage = pageNumber,
+    };
+
+    // Save the property filter with the userId to the database
+    _context.PropertyFilters.Add(propertyFilter);
+    await _context.SaveChangesAsync();
+
+    return Ok(responseDTO);
+}
+
+        [HttpGet]
+[Route("getPaginatedAdmin")]
+public async Task<IActionResult> GetPaginatedAdmin([FromQuery] PropertyGetPaginatedRequestDTO request)
+{
+    // Fetching the userId from the JWT token
+    int userId = Convert.ToInt32(User.FindFirst("Id")?.Value);
+
+    var minPrice = request.MinPrice ?? 0;
+    var maxPrice = request.MaxPrice ?? int.MaxValue;
+    var pageSize = request.PageSize ?? 5;
+    var pageNumber = request.Page ?? 1;
+
+    // Adding userId to the property filter
+    var propertyFilter = new SavePropertyFilter
+    {
+        MinPrice = minPrice,
+        MaxPrice = maxPrice,
+        CurrencyTypeId = request.CurrencyId ?? 0,
+        PropertyTypeId = request.TypeId ?? 0,
+        StatusId = request.StatusId ?? 0,
+        AppliedDateTime = DateTime.Now,
+        UserId = userId  // Storing the userId of the current user
+    };
+
+    // Filter the properties based on the request
+    var query = _context.Properties
+        .AsNoTracking()
+        .Where(x => x.Status != (int)EntityStatus.Deleted && x.FilterId == 0)
+        .Where(x => x.PropertyTypeId == request.TypeId || request.TypeId == null)
+        .Where(x => x.PropertyStatusId == request.StatusId || request.StatusId == null)
+        .Where(x => x.CurrencyId == request.CurrencyId || request.CurrencyId == null)
+        .Where(x => x.Price >= minPrice && x.Price <= maxPrice)
+        .Include(x => x.Currency)
+        .Include(x => x.PropertyStatus)
+        .Include(x => x.PropertyType)
+        .OrderBy(x => x.SortId);
 
     var totalItems = await query.CountAsync();
     var numberOfPages = (int)Math.Ceiling((double)totalItems / pageSize);
@@ -435,6 +513,7 @@ public async Task<IActionResult> GetPaginated([FromQuery] PropertyGetPaginatedRe
             }
 
             int userId = Convert.ToInt32(User.FindFirst("Id")?.Value);
+            int rowCount = _context.Properties.Count();
 
             var newProperty = new Property
             {
@@ -447,7 +526,9 @@ public async Task<IActionResult> GetPaginated([FromQuery] PropertyGetPaginatedRe
                 PropertyStatusId = request.PropertyStatusId,
                 CurrencyId = request.CurrencyId,
                 Price = request.Price,
-                UserId = userId
+                UserId = userId,
+                SortId = rowCount + 11,
+                PropertyInfo = request.PropertyInfo
             };
             var addedProperty = _context.Properties.Add(newProperty);
             await _context.SaveChangesAsync();
